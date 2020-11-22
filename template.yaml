@@ -29,7 +29,7 @@ Resources:
         Variables:
           CLIENT_ID: !Ref clientId
           CLIENT_SECRET: !Ref clientSecret
-          USERS_TABLE: !Ref UserDynamoTable
+          USER_TABLE: !Ref UserDynamoTable
           REDIRECT_URI: !Ref redirectUri
       Policies:
         - DynamoDBCrudPolicy:
@@ -60,7 +60,7 @@ Resources:
         Variables:
           CLIENT_ID: !Ref clientId
           CLIENT_SECRET: !Ref clientSecret
-          USERS_TABLE: !Ref UserDynamoTable
+          USER_TABLE: !Ref UserDynamoTable
           REDIRECT_URI: !Ref redirectUri
       Policies:
         - DynamoDBCrudPolicy:

@@ -9,7 +9,7 @@ exports.main = async (event, context, callback) => {
     console.log(email);
     try{
         var queryParams = {
-            TableName : process.env.USERS_TABLE,
+            TableName : process.env.USER_TABLE,
             Key: { email },
         };
         const data = await docClient.get(queryParams).promise();
@@ -32,7 +32,7 @@ exports.main = async (event, context, callback) => {
             const githubCredentials = qs.parse(githubCredentialsResponse.data);
             
             var updateParams = {
-                TableName: process.env.USERS_TABLE,
+                TableName: process.env.USER_TABLE,
                 Key:{ email },
                 UpdateExpression: "set github.credentials.access_token = :r, github.credentials.expires_in = :p",
                 ExpressionAttributeValues:{

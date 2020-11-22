@@ -39,7 +39,7 @@ exports.main = async (event, context, callback) => {
             const emails = githubUserEmailsResponse.data;
 
             var params = {
-                TableName: process.env.USERS_TABLE,
+                TableName: process.env.USER_TABLE,
                 Item: {
                     email: emails.find(email => email.primary).email,
                     github: { 
