@@ -1,0 +1,93 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  api
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Parameters:
+  clientId:
+    Type: String
+    Description: Stores the CLIENT_ID of a GITHUB App
+  clientSecret:
+    Type: String
+    Description: Stores the CLIENT_SECRET of a GITHUB App
+  redirectUri:
+    Type: String
+    Description: 'Stores the Redirect URI used by the service to send the Github auth_token. Example: http://localhost:7482'
+
+Resources:
+  githubAuthApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/github-auth.main
+      Runtime: nodejs12.x
+      MemorySize: 128
+      Timeout: 100
+      Description: Service for Github App Authentication
+      Environment:
+        Variables:
+          CLIENT_ID: !Ref clientId
+          CLIENT_SECRET: !Ref clientSecret
+          USERS_TABLE: !Ref UserDynamoTable
+          REDIRECT_URI: !Ref redirectUri
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserDynamoTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /auth/github
+            Method: GET
+            RequestParameters:
+              - method.request.querystring.code:
+                  Required: true
+                  Caching: false
+              - method.request.querystring.refresh_token:
+                  Required: false
+                  Caching: false
+  
+  githubRefreshTokenApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/github-auth-refreshtoken.main
+      Runtime: nodejs12.x
+      MemorySize: 128
+      Timeout: 100
+      Description: Service to Refresh Github Auth Token
+      Environment:
+        Variables:
+          CLIENT_ID: !Ref clientId
+          CLIENT_SECRET: !Ref clientSecret
+          USERS_TABLE: !Ref UserDynamoTable
+          REDIRECT_URI: !Ref redirectUri
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserDynamoTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /auth/github/refresh
+            Method: GET
+            RequestParameters:
+              - method.request.querystring.email:
+                  Required: true
+                  Caching: false
+
+  UserDynamoTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: User
+      PrimaryKey:
+        Name: email
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+
+Outputs:
+  githubAuthApiEndpoint:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com"
