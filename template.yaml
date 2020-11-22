@@ -17,7 +17,7 @@ Parameters:
     Description: 'Stores the Redirect URI used by the service to send the Github auth_token. Example: http://localhost:7482'
 
 Resources:
-  githubAuthApi:
+  GithubAuthFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/github-auth.main
@@ -48,7 +48,7 @@ Resources:
                   Required: false
                   Caching: false
   
-  githubRefreshTokenApi:
+  GithubRefreshTokenFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/github-auth-refreshtoken.main
@@ -88,6 +88,6 @@ Resources:
         WriteCapacityUnits: 1
 
 Outputs:
-  githubAuthApiEndpoint:
+  serverlessApi:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com"
