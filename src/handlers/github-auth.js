@@ -1,8 +1,7 @@
 const { getAccessToken, getUser, getUserEmails } = require('../services/github');
 const { createRedirectResponse } = require('../utils/redirect');
+const { User } = require('../dynamodb');
 const qs = require('qs');
-const dynamodb = require('aws-sdk/clients/dynamodb');
-const docClient = new dynamodb.DocumentClient();
 
 exports.main = async (event, context, callback) => {
     const redirect_uri = `https://${event.headers.Host}/${event.requestContext.stage}${event.path}`;
@@ -51,7 +50,7 @@ exports.main = async (event, context, callback) => {
             };
 
             try {
-                await docClient.put(params).promise();
+                await User.put(params).promise();
                 console.log("Save operation was successful.");
                 callback(null,  createRedirectResponse({
                     user : user,

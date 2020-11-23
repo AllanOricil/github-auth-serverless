@@ -1,8 +1,7 @@
 const { getAccessToken } = require('../services/github');
 const { createRedirectResponse } = require('../utils/redirect');
+const { User } = require('../dynamo');
 const qs = require('qs');
-const dynamodb = require('aws-sdk/clients/dynamodb');
-const docClient = new dynamodb.DocumentClient();
 
 exports.main = async (event, context, callback) => {
     const email = event.queryStringParameters.email;
@@ -12,7 +11,7 @@ exports.main = async (event, context, callback) => {
             TableName : process.env.USER_TABLE,
             Key: { email },
         };
-        const data = await docClient.get(queryParams).promise();
+        const data = await User.get(queryParams).promise();
         const user = data.Item;
         console.log(user);
         const refreshToken = user.github.credentials.refresh_token;
@@ -43,7 +42,7 @@ exports.main = async (event, context, callback) => {
             };
 
             try {
-                await docClient.update(updateParams).promise();
+                await User.update(updateParams).promise();
                 console.log("Save operation was successful.");
                 callback(null, createRedirectResponse({
                     user : user,
